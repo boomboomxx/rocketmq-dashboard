@@ -82,6 +82,13 @@ const remoteApi = {
             });
 
             if (response.redirected) {
+                // 检查重定向URL是否为HTTP，在HTTPS环境下强制改为HTTPS
+                const redirectUrl = new URL(response.url);
+                if (redirectUrl.protocol === 'http:' && window.location.protocol === 'https:') {
+                    redirectUrl.protocol = 'https:';
+                    window.location.href = redirectUrl.toString();
+                    return {__isRedirectHandled: true};
+                }
                 if (_redirectHandler) {
                     _redirectHandler();
                 }
