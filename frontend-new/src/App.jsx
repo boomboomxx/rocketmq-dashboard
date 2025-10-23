@@ -15,19 +15,20 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import AppRouter from './router'; // 你 router/index.jsx 导出的组件
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {ConfigProvider} from "antd";
 import {useTheme} from "./store/context/ThemeContext";
+import {loadLocale, useLanguage} from "./i18n/LanguageContext";
 
 function App() {
     const {currentTheme} = useTheme();
-
+    const {locale} = useLanguage();
     return (
         <>
-            <ConfigProvider theme={currentTheme}>
+            <ConfigProvider theme={currentTheme} locale={locale}>
                 <ToastContainer/>
                 <AppRouter/>
             </ConfigProvider>

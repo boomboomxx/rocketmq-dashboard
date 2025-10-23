@@ -283,7 +283,7 @@ const MessageTraceQueryPage = () => {
                             <h5 style={{margin: '15px 0'}}>{t.ONLY_RETURN_64_MESSAGES}</h5>
                             <div style={{padding: '20px', minHeight: '600px'}}>
                                 <Form layout="inline" form={form} style={{marginBottom: '20px'}}>
-                                    <Form.Item label="Topic:">
+                                    <Form.Item label={`${t.TOPIC}:`}>
                                         <Select
                                             showSearch
                                             style={{width: 300}}
@@ -330,7 +330,7 @@ const MessageTraceQueryPage = () => {
                             <h5 style={{margin: '15px 0'}}>{t.MESSAGE_ID_TOPIC_HINT}</h5>
                             <div style={{padding: '20px', minHeight: '600px'}}>
                                 <Form layout="inline" style={{marginBottom: '20px'}}>
-                                    <Form.Item label="Topic:">
+                                    <Form.Item label={`${t.TOPIC}:`}>
                                         <Select
                                             showSearch
                                             style={{width: 300}}

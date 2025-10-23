@@ -372,10 +372,11 @@ public class MessageServiceImpl implements MessageService {
                     PullResult pullResult = consumer.pull(queueOffsetInfo.getMessageQueues(), "*", start, 32);
                     if (pullResult.getPullStatus() == PullStatus.FOUND) {
                         List<MessageExt> poll = pullResult.getMsgFoundList();
-                        if (poll.size() == 0) {
+                        if (poll.isEmpty()) {
                             break;
                         }
                         List<MessageView> collect = poll.stream()
+                                .sorted(Comparator.comparing(MessageExt::getStoreTimestamp).reversed())
                                 .map(MessageView::fromMessageExt).collect(Collectors.toList());
 
                         for (MessageView view : collect) {
@@ -390,6 +391,8 @@ public class MessageServiceImpl implements MessageService {
 
                 }
             }
+            messageViews.sort(Comparator.comparingLong(MessageView::getStoreTimestamp));
+
             PageImpl<MessageView> page = new PageImpl<>(messageViews, query.page(), total);
             return new MessagePageTask(page, queueOffsetInfos);
         } catch (Exception e) {
@@ -457,6 +460,7 @@ public class MessageServiceImpl implements MessageService {
 
                 }
             }
+            messageViews.sort(Comparator.comparingLong(MessageView::getStoreTimestamp));
             return new PageImpl<>(messageViews, query.page(), total);
         } catch (Exception e) {
             Throwables.throwIfUnchecked(e);

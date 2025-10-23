@@ -34,7 +34,8 @@ import moment from 'moment';
 import {ExportOutlined, SearchOutlined, SendOutlined} from '@ant-design/icons';
 import DlqMessageDetailViewDialog from "../../components/DlqMessageDetailViewDialog"; // Ensure this path is correct
 import {useLanguage} from '../../i18n/LanguageContext'; // Ensure this path is correct
-import {remoteApi} from '../../api/remoteApi/remoteApi'; // Adjust the path to your remoteApi.js file
+import {remoteApi} from '../../api/remoteApi/remoteApi';
+import dayjs from "dayjs"; // Adjust the path to your remoteApi.js file
 
 const {TabPane} = Tabs;
 const {Option} = Select;
@@ -42,7 +43,7 @@ const {Text, Paragraph} = Typography;
 
 const SYS_GROUP_TOPIC_PREFIX = "CID_RMQ_SYS_"; // Define this constant as in Angular
 const DLQ_GROUP_TOPIC_PREFIX = "%DLQ%"; // Define this constant
-
+const { RangePicker } = DatePicker;
 const DlqMessageQueryPage = () => {
     const {t} = useLanguage();
     const [activeTab, setActiveTab] = useState('consumer');
@@ -52,6 +53,8 @@ const DlqMessageQueryPage = () => {
     // Consumer 查询状态
     const [allConsumerGroupList, setAllConsumerGroupList] = useState([]);
     const [selectedConsumerGroup, setSelectedConsumerGroup] = useState(null);
+    const [timepickerRange, setTimepickerRange] = useState([dayjs().subtract(1,'hour'), dayjs()])
+
     const [timepickerBegin, setTimepickerBegin] = useState(moment().subtract(3, 'hour')); // 默认三小时前
     const [timepickerEnd, setTimepickerEnd] = useState(moment());
     const [messageShowList, setMessageShowList] = useState([]);
@@ -117,18 +120,18 @@ const DlqMessageQueryPage = () => {
             });
             return;
         }
-        if (moment(timepickerEnd).valueOf() < moment(timepickerBegin).valueOf()) {
-            notificationApi.error({message: t.END_TIME_LATER_THAN_BEGIN_TIME, delay: 2000});
-            return;
-        }
+        // if (moment(timepickerEnd).valueOf() < moment(timepickerBegin).valueOf()) {
+        //     notificationApi.error({message: t.END_TIME_LATER_THAN_BEGIN_TIME, delay: 2000});
+        //     return;
+        // }
 
         setLoading(true);
         // console.log("根据消费者组查询DLQ消息:", { selectedConsumerGroup, timepickerBegin, timepickerEnd, page, pageSize, taskId });
         try {
             const resp = await remoteApi.queryDlqMessageByConsumerGroup(
                 selectedConsumerGroup,
-                moment(timepickerBegin).valueOf(),
-                moment(timepickerEnd).valueOf(),
+                timepickerRange[0].valueOf(),
+                timepickerRange[1].valueOf(),
                 page,
                 pageSize,
                 taskId
@@ -574,26 +577,19 @@ const DlqMessageQueryPage = () => {
                                             ))}
                                         </Select>
                                     </Form.Item>
-                                    <Form.Item label={t.BEGIN}>
-                                        <DatePicker
-                                            showTime
+                                    <Form.Item label={t.DATE_TIME_RANGE}>
+                                        <RangePicker
+                                            presets={[
+                                                {label: t.DATE_TIME_RANGE_TODAY, value: [dayjs().hour(0).minute(0).second(0), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_ONE_HOUR, value: [dayjs().subtract(1, 'h'), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_ONE_DAY, value: [dayjs().subtract(1, 'd'), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_ONE_WEEK, value: [dayjs().subtract(1, 'w'), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_TWO_WEEKS, value: [dayjs().subtract(2, 'w'), dayjs()]},
+                                            ]}
                                             format="YYYY-MM-DD HH:mm:ss"
-                                            value={timepickerBegin}
-                                            onChange={(date) => {
-                                                setTimepickerBegin(date);
-                                                onChangeQueryCondition();
-                                            }}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label={t.END}>
-                                        <DatePicker
-                                            showTime
-                                            format="YYYY-MM-DD HH:mm:ss"
-                                            value={timepickerEnd}
-                                            onChange={(date) => {
-                                                setTimepickerEnd(date);
-                                                onChangeQueryCondition();
-                                            }}
+                                            showTime={{ defaultOpenValue: dayjs('00:00:00', 'HH:mm:ss') }}
+                                            value={timepickerRange}
+                                            onChange={setTimepickerRange}
                                         />
                                     </Form.Item>
                                     <Form.Item>

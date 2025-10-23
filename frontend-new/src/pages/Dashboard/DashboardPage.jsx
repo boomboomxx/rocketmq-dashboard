@@ -21,6 +21,7 @@ import * as echarts from 'echarts';
 import moment from 'moment';
 import {useLanguage} from '../../i18n/LanguageContext';
 import {remoteApi, tools} from '../../api/remoteApi/remoteApi';
+import dayjs from "dayjs";
 
 const {Option} = Select;
 
@@ -32,7 +33,7 @@ const DashboardPage = () => {
     const topicLineChartRef = useRef(null);
 
     const [loading, setLoading] = useState(false);
-    const [date, setDate] = useState(moment());
+    const [date, setDate] = useState(dayjs());
     const [topicNames, setTopicNames] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [brokerTableData, setBrokerTableData] = useState([]);
@@ -393,6 +394,10 @@ const DashboardPage = () => {
                         <Col span={12}>
                             <Card title={t.DASHBOARD_DATE_SELECTION} bordered>
                                 <DatePicker
+                                    disabledDate={(current) => {
+                                        const now = dayjs();
+                                        return current && current > now;
+                                    }}
                                     format="YYYY-MM-DD"
                                     value={date}
                                     onChange={setDate}

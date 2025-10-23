@@ -22,6 +22,9 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {useLanguage} from '../i18n/LanguageContext';
 import {useTheme} from "../store/context/ThemeContext";
 import {remoteApi} from "../api/remoteApi/remoteApi";
+import dayjs from 'dayjs';
+
+import 'dayjs/locale/zh-cn';
 
 const {Header} = Layout;
 const {useBreakpoint} = Grid; // Used to determine screen breakpoints
@@ -69,7 +72,13 @@ const Navbar = ({rmqVersion = true, showAcl = true}) => {
     }, []);
 
     const langMenu = (
-        <Menu onClick={({key}) => setLang(key)}>
+        <Menu onClick={({key}) => {
+            setLang(key)
+            window.localStorage.setItem("lang", key);
+            if (key === 'zh') {
+                dayjs.locale('zh-cn');
+            }
+        }}>
             <Menu.Item key="en">{t.ENGLISH}</Menu.Item>
             <Menu.Item key="zh">{t.CHINESE}</Menu.Item>
         </Menu>

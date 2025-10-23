@@ -18,6 +18,7 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, message, Select, Table} from 'antd';
 import {remoteApi} from '../../api/remoteApi/remoteApi';
+import {useLanguage} from "../../i18n/LanguageContext";
 
 const {Option} = Select;
 
@@ -26,6 +27,7 @@ const ProducerConnectionList = () => {
     const [allTopicList, setAllTopicList] = useState([]);
     const [connectionList, setConnectionList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const {t} = useLanguage()
     const [messageApi, msgContextHolder] = message.useMessage();
     useEffect(() => {
         const fetchTopicList = async () => {
@@ -101,11 +103,11 @@ const ProducerConnectionList = () => {
                     onFinish={onFinish}
                     style={{marginBottom: 20}}
                 >
-                    <Form.Item label="TOPIC" name="selectedTopic"
-                               rules={[{required: true, message: 'Please select a topic!'}]}>
+                    <Form.Item label={t.TOPIC} name="selectedTopic"
+                               rules={[{required: true, message: t.PLEASE_SELECT_TOPIC}]}>
                         <Select
                             showSearch
-                            placeholder="Select a topic"
+                            placeholder={t.SELECT_TOPIC_PLACEHOLDER}
                             style={{width: 300}}
                             optionFilterProp="children"
                             filterOption={(input, option) =>
@@ -117,8 +119,8 @@ const ProducerConnectionList = () => {
                             ))}
                         </Select>
                     </Form.Item>
-                    <Form.Item label="PRODUCER_GROUP" name="producerGroup"
-                               rules={[{required: true, message: 'Please input producer group!'}]}>
+                    <Form.Item label={t.PRODUCER_GROUP} name="producerGroup"
+                               rules={[{required: true, message: t.PLEASE_INPUT_PRODUCER_GROUP}]}>
                         <Input style={{width: 300}}/>
                     </Form.Item>
                     <Form.Item>

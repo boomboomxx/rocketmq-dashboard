@@ -67,13 +67,11 @@ const remoteApi = {
 
 
         const csrfToken = await remoteApi.getCsrfToken();
-        console.log(csrfToken)
         if (!csrfToken) {
             console.warn('CSRF Token not found');
         }else{
             headers["X-XSRF-TOKEN"] = csrfToken;
         }
-        console.log(csrfToken)
 
 
         try {

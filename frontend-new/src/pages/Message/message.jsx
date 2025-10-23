@@ -21,22 +21,22 @@ import moment from 'moment';
 import {SearchOutlined} from '@ant-design/icons';
 import {useLanguage} from '../../i18n/LanguageContext';
 import MessageDetailViewDialog from "../../components/MessageDetailViewDialog"; // Keep this path
-import {remoteApi} from '../../api/remoteApi/remoteApi'; // Keep this path
+import {remoteApi} from '../../api/remoteApi/remoteApi';
+import dayjs from "dayjs"; // Keep this path
 
 const {TabPane} = Tabs;
 const {Option} = Select;
 const {Text, Paragraph} = Typography;
+const { RangePicker } = DatePicker;
 
 const MessageQueryPage = () => {
     const {t} = useLanguage();
     const [activeTab, setActiveTab] = useState('topic');
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
-
     const [allTopicList, setAllTopicList] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
-    const [timepickerBegin, setTimepickerBegin] = useState(moment().subtract(1, 'hour'));
-    const [timepickerEnd, setTimepickerEnd] = useState(moment());
+    const [timepickerRange, setTimepickerRange] = useState([dayjs().subtract(1,'hour'), dayjs()])
     const [messageShowList, setMessageShowList] = useState([]);
     const [paginationConf, setPaginationConf] = useState({
         current: 1,
@@ -98,12 +98,8 @@ const MessageQueryPage = () => {
         if (!selectedTopic) {
             notificationApi.warning({
                 message: t.WARNING,
-                description: t.PLEASE_SELECT_TOPIC,
+                description: t.TOPIC_AND_KEY_REQUIRED,
             });
-            return;
-        }
-        if (timepickerEnd.valueOf() < timepickerBegin.valueOf()) {
-            notificationApi.error({message: t.ERROR, description: t.END_TIME_EARLIER_THAN_BEGIN_TIME});
             return;
         }
 
@@ -111,8 +107,8 @@ const MessageQueryPage = () => {
         try {
             const resp = await remoteApi.queryMessagePageByTopic(
                 selectedTopic,
-                timepickerBegin.valueOf(),
-                timepickerEnd.valueOf(),
+                timepickerRange[0].valueOf(),
+                timepickerRange[1].valueOf(),
                 page,
                 pageSize,
                 taskId
@@ -327,26 +323,20 @@ const MessageQueryPage = () => {
                                             ))}
                                         </Select>
                                     </Form.Item>
-                                    <Form.Item label={t.BEGIN}>
-                                        <DatePicker
-                                            showTime
+                                    <Form.Item label={t.DATE_TIME_RANGE}>
+                                        <RangePicker
+                                            presets={[
+                                                {label: t.DATE_TIME_RANGE_TODAY, value: [dayjs().hour(0).minute(0).second(0), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_ONE_HOUR, value: [dayjs().subtract(1, 'h'), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_ONE_DAY, value: [dayjs().subtract(1, 'd'), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_ONE_WEEK, value: [dayjs().subtract(1, 'w'), dayjs()]},
+                                                {label: t.DATE_TIME_RANGE_LAST_TWO_WEEKS, value: [dayjs().subtract(2, 'w'), dayjs()]},
+                                            ]}
+
                                             format="YYYY-MM-DD HH:mm:ss"
-                                            value={timepickerBegin}
-                                            onChange={(date) => {
-                                                setTimepickerBegin(date);
-                                                onChangeQueryCondition();
-                                            }}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item label={t.END}>
-                                        <DatePicker
-                                            showTime
-                                            format="YYYY-MM-DD HH:mm:ss"
-                                            value={timepickerEnd}
-                                            onChange={(date) => {
-                                                setTimepickerEnd(date);
-                                                onChangeQueryCondition();
-                                            }}
+                                            showTime={{ defaultOpenValue: dayjs('00:00:00', 'HH:mm:ss') }}
+                                            value={timepickerRange}
+                                            onChange={setTimepickerRange}
                                         />
                                     </Form.Item>
                                     <Form.Item>
