@@ -49,7 +49,23 @@ management:
 
 logging:
   config: classpath:logback.xml
-
+cors:
+  allowed-origins:
+    - "http://localhost:3002"
+  allowed-methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+  allow-credentials: true
+  allowed-headers:
+    - "content-type"
+    - "Authorization"
+    - "X-Requested-With"
+    - "Origin"
+    - "Accept"
+    - "X-XSRF-TOKEN"
 rocketmq:
   config:
     # if this value is empty,use env value rocketmq.config.namesrvAddr  NAMESRV_ADDR | now, default localhost:9876

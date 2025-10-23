@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.dashboard.config;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections.CollectionUtils;
@@ -33,6 +34,7 @@ import org.springframework.http.HttpStatus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.rocketmq.client.ClientConfig.SEND_MESSAGE_WITH_VIP_CHANNEL_PROPERTY;
@@ -94,6 +96,10 @@ public class RMQConfigure {
     @Setter
     @Getter
     private String authMode = "file";
+
+    @Getter
+    @Setter
+    private CorsConfigure cors;
 
     public void setProxyAddrs(List<String> proxyAddrs) {
         this.proxyAddrs = proxyAddrs;

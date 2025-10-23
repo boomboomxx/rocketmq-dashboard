@@ -17,6 +17,8 @@
 
 package org.apache.rocketmq.dashboard.config;
 
+import com.google.common.collect.Lists;
+import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,13 +31,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Resource
+    private CorsConfigure cors;
+
+    private final List<String> DEFAULT_ALLOWED_METHODS = Lists.newArrayList("GET", "POST", "PUT", "DELETE", "OPTIONS");
+    private final List<String> DEFAULT_ALLOWED_HEADERS = Lists.newArrayList("content-type", "Authorization", "X-Requested-With", "Origin", "Accept", "X-XSRF-TOKEN");
+    private final List<String> DEFAULT_ALLOWED_ORIGINS = Lists.newArrayList("http://localhost:3002");
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -57,18 +66,28 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3003"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("content-type", "Authorization", "X-Requested-With", "Origin", "Accept", "X-XSRF-TOKEN"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+
+        cors.getAllowedOrigins().addAll(DEFAULT_ALLOWED_METHODS);
+        configuration.setAllowedOrigins(distinctList(cors.getAllowedOrigins(), DEFAULT_ALLOWED_ORIGINS));
+        configuration.setAllowedMethods(distinctList(cors.getAllowedMethods(), DEFAULT_ALLOWED_METHODS));
+        configuration.setAllowedHeaders(distinctList(cors.getAllowedHeaders(), DEFAULT_ALLOWED_HEADERS));
+        configuration.setAllowCredentials(cors.getAllowCredentials());
+        configuration.setMaxAge(cors.getMaxAge());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
     public CsrfTokenRepository csrfTokenRepository() {
         return CookieCsrfTokenRepository.withHttpOnlyFalse();
+    }
+
+    private List<String> distinctList(List<String> first, List<String> second) {
+        Set<String> set = new HashSet<>();
+        set.addAll(first);
+        set.addAll(second);
+        return new ArrayList<>(set);
     }
 }
