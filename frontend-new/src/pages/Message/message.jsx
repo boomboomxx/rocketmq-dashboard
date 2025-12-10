@@ -27,7 +27,7 @@ import dayjs from "dayjs"; // Keep this path
 const {TabPane} = Tabs;
 const {Option} = Select;
 const {Text, Paragraph} = Typography;
-const { RangePicker } = DatePicker;
+const {RangePicker} = DatePicker;
 
 const MessageQueryPage = () => {
     const {t} = useLanguage();
@@ -36,7 +36,7 @@ const MessageQueryPage = () => {
     const [loading, setLoading] = useState(false);
     const [allTopicList, setAllTopicList] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
-    const [timepickerRange, setTimepickerRange] = useState([dayjs().subtract(1,'hour'), dayjs()])
+    const [timepickerRange, setTimepickerRange] = useState([dayjs().subtract(1, 'hour'), dayjs()])
     const [messageShowList, setMessageShowList] = useState([]);
     const [paginationConf, setPaginationConf] = useState({
         current: 1,
@@ -58,6 +58,10 @@ const MessageQueryPage = () => {
     const [currentTopicForDetail, setCurrentTopicForDetail] = useState(null);
     const [notificationApi, notificationContextHolder] = notification.useNotification();
 
+    const onTimepickerChange = (timepickerRange) => {
+        setTimepickerRange(timepickerRange)
+        setTaskId("")
+    }
     const fetchAllTopics = useCallback(async () => {
         setLoading(true);
         try {
@@ -326,17 +330,32 @@ const MessageQueryPage = () => {
                                     <Form.Item label={t.DATE_TIME_RANGE}>
                                         <RangePicker
                                             presets={[
-                                                {label: t.DATE_TIME_RANGE_TODAY, value: [dayjs().hour(0).minute(0).second(0), dayjs()]},
-                                                {label: t.DATE_TIME_RANGE_LAST_ONE_HOUR, value: [dayjs().subtract(1, 'h'), dayjs()]},
-                                                {label: t.DATE_TIME_RANGE_LAST_ONE_DAY, value: [dayjs().subtract(1, 'd'), dayjs()]},
-                                                {label: t.DATE_TIME_RANGE_LAST_ONE_WEEK, value: [dayjs().subtract(1, 'w'), dayjs()]},
-                                                {label: t.DATE_TIME_RANGE_LAST_TWO_WEEKS, value: [dayjs().subtract(2, 'w'), dayjs()]},
+                                                {
+                                                    label: t.DATE_TIME_RANGE_TODAY,
+                                                    value: [dayjs().hour(0).minute(0).second(0), dayjs()]
+                                                },
+                                                {
+                                                    label: t.DATE_TIME_RANGE_LAST_ONE_HOUR,
+                                                    value: [dayjs().subtract(1, 'h'), dayjs()]
+                                                },
+                                                {
+                                                    label: t.DATE_TIME_RANGE_LAST_ONE_DAY,
+                                                    value: [dayjs().subtract(1, 'd'), dayjs()]
+                                                },
+                                                {
+                                                    label: t.DATE_TIME_RANGE_LAST_ONE_WEEK,
+                                                    value: [dayjs().subtract(1, 'w'), dayjs()]
+                                                },
+                                                {
+                                                    label: t.DATE_TIME_RANGE_LAST_TWO_WEEKS,
+                                                    value: [dayjs().subtract(2, 'w'), dayjs()]
+                                                },
                                             ]}
 
                                             format="YYYY-MM-DD HH:mm:ss"
-                                            showTime={{ defaultOpenValue: dayjs('00:00:00', 'HH:mm:ss') }}
+                                            showTime={{defaultOpenValue: dayjs('00:00:00', 'HH:mm:ss')}}
                                             value={timepickerRange}
-                                            onChange={setTimepickerRange}
+                                            onChange={onTimepickerChange}
                                         />
                                     </Form.Item>
                                     <Form.Item>

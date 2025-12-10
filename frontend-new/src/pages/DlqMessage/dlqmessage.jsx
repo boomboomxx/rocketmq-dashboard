@@ -68,6 +68,10 @@ const DlqMessageQueryPage = () => {
     const [messageCheckedList, setMessageCheckedList] = useState([]); // Stores full message objects for checked items
     const [taskId, setTaskId] = useState("");
 
+    const onTimepickerChange = (timepickerRange) => {
+        setTimepickerRange(timepickerRange)
+        setTaskId("")
+    }
 
     // Message ID 查询状态
     const [messageId, setMessageId] = useState('');
@@ -589,7 +593,7 @@ const DlqMessageQueryPage = () => {
                                             format="YYYY-MM-DD HH:mm:ss"
                                             showTime={{ defaultOpenValue: dayjs('00:00:00', 'HH:mm:ss') }}
                                             value={timepickerRange}
-                                            onChange={setTimepickerRange}
+                                            onChange={onTimepickerChange}
                                         />
                                     </Form.Item>
                                     <Form.Item>
